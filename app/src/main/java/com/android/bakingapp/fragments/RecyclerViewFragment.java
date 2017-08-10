@@ -1,6 +1,8 @@
 package com.android.bakingapp.fragments;
 
 import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -59,19 +61,36 @@ public class RecyclerViewFragment extends Fragment implements RecipeAdapter.List
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_recycler_view, container, false);
         ButterKnife.bind(this, rootView);
-        MainActivity mainActiivty = ((MainActivity) getActivity());
-        emptyView.setVisibility(View.GONE);
-        setAdapter(new ArrayList<Recipe>());
-        getActivity().getSupportLoaderManager().initLoader(0, null, mainActiivty).forceLoad();
-
+        if (checkConnection()) {
+            MainActivity mainActiivty = ((MainActivity) getActivity());
+            emptyView.setVisibility(View.GONE);
+            setAdapter(new ArrayList<Recipe>());
+            getActivity().getSupportLoaderManager().initLoader(0, null, mainActiivty).forceLoad();
+        } else {
+            setInfoNoConnection();
+        }
         return rootView;
+    }
+
+    private boolean checkConnection() {
+        ConnectivityManager cm = (ConnectivityManager) getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        boolean isConnected = activeNetwork != null && activeNetwork.isConnectedOrConnecting();
+        return isConnected;
+    }
+    private void setInfoNoConnection() {
+        recyclerView.setVisibility(View.GONE);
+        loadingIndicator.setVisibility(View.GONE);
+        emptyView.setVisibility(View.VISIBLE);
+        emptyTitleText.setText(getString(R.string.no_connection));
+        emptySubtitleText.setText(getString(R.string.no_connection_sub_text));
     }
 
     public void setAdapter(List<Recipe> recipeList) {
         GridLayoutManager layoutManager;
-        if(isLandscape) {
+        if (isLandscape) {
             layoutManager = new GridLayoutManager(getContext(), 3);
-        }else{
+        } else {
             layoutManager = new GridLayoutManager(getContext(), 1);
         }
         recyclerView.setLayoutManager(layoutManager);

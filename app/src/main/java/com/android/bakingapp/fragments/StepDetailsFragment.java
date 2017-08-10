@@ -38,10 +38,6 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-/**
- * Created by ART_F on 2017-08-08.
- */
-
 public class StepDetailsFragment extends Fragment implements ExoPlayer.EventListener, View.OnTouchListener {
     private static final String TAG = StepDetailsFragment.class.getSimpleName();
     private static MediaSessionCompat mMediaSession;
@@ -73,12 +69,7 @@ public class StepDetailsFragment extends Fragment implements ExoPlayer.EventList
         this.steps = steps;
         this.stepNo = stepNo;
 
-        if (mExoPlayer != null) {
-            mExoPlayer.release();
-            mExoPlayer = null;
-        }
-
-        initializeMediaSession();
+        releasePlayer();
         initializePlayer(Uri.parse(steps.get(stepNo).videoURL));
         description.setText(steps.get(stepNo).description);
     }
@@ -125,6 +116,22 @@ public class StepDetailsFragment extends Fragment implements ExoPlayer.EventList
         }
     }
 
+    private void releasePlayer() {
+        if (mExoPlayer != null) {
+            mExoPlayer.stop();
+            mExoPlayer.release();
+            mExoPlayer = null;
+        }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        releasePlayer();
+        mMediaSession.setActive(false);
+    }
+
+
     @Override public void onTimelineChanged(Timeline timeline, Object manifest) {
 
     }
@@ -138,7 +145,14 @@ public class StepDetailsFragment extends Fragment implements ExoPlayer.EventList
     }
 
     @Override public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
-
+        if ((playbackState == ExoPlayer.STATE_READY) && playWhenReady) {
+            mStateBuilder.setState(PlaybackStateCompat.STATE_PLAYING,
+                    mExoPlayer.getCurrentPosition(), 1f);
+        } else if ((playbackState == ExoPlayer.STATE_READY)) {
+            mStateBuilder.setState(PlaybackStateCompat.STATE_PAUSED,
+                    mExoPlayer.getCurrentPosition(), 1f);
+        }
+        mMediaSession.setPlaybackState(mStateBuilder.build());
     }
 
     @Override public void onPlayerError(ExoPlaybackException error) {

@@ -9,6 +9,9 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 
 import com.android.bakingapp.R;
@@ -73,4 +76,31 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewFragm
         intent.putExtra(RECIPE_KEY, jsonString);
         startActivity(intent);
     }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater menuInflater = getMenuInflater();
+        menuInflater.inflate(R.menu.menu, menu);
+        return true;
+    }
+
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        switch (id) {
+            case R.id.action_refresh:
+                FragmentManager fragmentManager = getSupportFragmentManager();
+                headFragment = new RecyclerViewFragment();
+                fragmentManager.beginTransaction()
+                        .add(R.id.recyclerViewFrame, headFragment)
+                        .commit();
+                break;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+        return true;
+    }
+
+
 }

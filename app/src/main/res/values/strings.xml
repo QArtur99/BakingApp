@@ -6,7 +6,14 @@
     <string name="no_connection_sub_text">Please fix your internet connection</string>
     <string name="server_problem">Server not responding</string>
     <string name="server_problem_sub_text">We will fix it as soon as possible</string>
+
+
+    //StepsFragment
     <string name="ingredients">Ingredients</string>
     <string name="steps">Steps</string>
+
+
+    //Settings menu
+    <string name="action_refresh">Refresh</string>
 
 </resources>
