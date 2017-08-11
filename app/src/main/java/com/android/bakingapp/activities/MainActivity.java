@@ -4,6 +4,11 @@ package com.android.bakingapp.activities;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.os.Handler;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.annotation.VisibleForTesting;
+import android.support.test.espresso.IdlingResource;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
@@ -16,6 +21,7 @@ import android.view.View;
 
 import com.android.bakingapp.R;
 import com.android.bakingapp.fragments.RecyclerViewFragment;
+import com.android.bakingapp.idlingResource.SimpleIdlingResource;
 import com.android.bakingapp.models.Recipe;
 import com.android.bakingapp.network.DataLoader;
 import com.google.gson.Gson;
@@ -29,6 +35,18 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewFragm
     public static final String STEP_NO_KEY = "StepNo";
     public static Boolean isLandscape = true;
     private RecyclerViewFragment headFragment;
+
+    @Nullable
+    private SimpleIdlingResource mIdlingResource;
+
+    @VisibleForTesting
+    @NonNull
+    public IdlingResource getIdlingResource() {
+        if (mIdlingResource == null) {
+            mIdlingResource = new SimpleIdlingResource();
+        }
+        return mIdlingResource;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,8 +78,21 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewFragm
 
     @Override
     public void onLoadFinished(Loader loader, Object object) {
+        if (mIdlingResource != null) {
+            mIdlingResource.setIdleState(false);
+        }
+
         List<Recipe> data = (List<Recipe>) object;
         headFragment.onLoadFinished(data);
+
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (mIdlingResource != null) {
+                    mIdlingResource.setIdleState(true);
+                }
+            }
+        }, 5000);
     }
 
     @Override

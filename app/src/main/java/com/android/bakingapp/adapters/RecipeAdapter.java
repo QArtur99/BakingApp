@@ -87,7 +87,7 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.MyViewHold
 
             Glide.with(context)
                     .load(posterURL)
-                    .thumbnail(Glide.with(context).load(R.drawable.nopic512))
+                    .thumbnail(Glide.with(context).load(R.drawable.baking_app))
                     .into(poster);
             movieTitle.setText(movie.name);
         }
