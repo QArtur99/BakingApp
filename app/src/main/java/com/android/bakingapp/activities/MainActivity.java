@@ -92,7 +92,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewFragm
                     mIdlingResource.setIdleState(true);
                 }
             }
-        }, 5000);
+        }, 2000);
     }
 
     @Override

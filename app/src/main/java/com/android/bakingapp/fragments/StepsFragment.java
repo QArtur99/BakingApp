@@ -24,10 +24,6 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-/**
- * Created by ART_F on 2017-08-08.
- */
-
 public class StepsFragment extends Fragment implements StepAdapter.ListItemClickListener {
     @BindView(R.id.recyclerView) RecyclerView recyclerView;
     @BindView(R.id.switchButton) Button switchButton;
@@ -35,6 +31,8 @@ public class StepsFragment extends Fragment implements StepAdapter.ListItemClick
     private StepAdapter recipeAdapter;
     private Recipe recipe;
     private boolean isSteps = true;
+    private View previousView;
+    private boolean firstClick = false;
 
     @Override
     public void onAttach(Context context) {
@@ -83,12 +81,16 @@ public class StepsFragment extends Fragment implements StepAdapter.ListItemClick
     }
 
     @Override
-    public void onListItemClick(int clickedItemIndex) {
-//        StepDetailsFragment stepDetailsFragment = (StepDetailsFragment) getActivity().getSupportFragmentManager().findFragmentByTag("Step");
-//        if(stepDetailsFragment != null) {
-//            stepDetailsFragment.setStep(recipeAdapter.getStepList(), clickedItemIndex);
-//        }
-        mCallback.onImageSelected(recipeAdapter.getStepList(), clickedItemIndex);
+    public void onListItemClick(int clickedItemIndex, View view) {
+        if (previousView != null) {
+            previousView.setSelected(false);
+        }
+        view.setSelected(true);
+        previousView = view;
+        if (firstClick) {
+            mCallback.onImageSelected(recipeAdapter.getStepList(), clickedItemIndex);
+        }
+        firstClick = true;
     }
 
     @OnClick(R.id.switchButton)

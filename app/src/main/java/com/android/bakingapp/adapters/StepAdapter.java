@@ -6,6 +6,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.android.bakingapp.R;
@@ -75,22 +76,12 @@ public class StepAdapter extends RecyclerView.Adapter<StepAdapter.MyViewHolder> 
         }
     }
 
-//    public void clearMovies() {
-//        this.data.clear();
-//        notifyDataSetChanged();
-//    }
-//
-//    public void setMovies(List<Recipe> data) {
-//        this.data.addAll(data);
-//        notifyDataSetChanged();
-//    }
-//
     public List<Step> getStepList() {
         return stepList;
     }
 
     public interface ListItemClickListener {
-        void onListItemClick(int clickedItemIndex);
+        void onListItemClick(int clickedItemIndex, View view);
     }
 
     public class MyViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -104,6 +95,9 @@ public class StepAdapter extends RecyclerView.Adapter<StepAdapter.MyViewHolder> 
         @Nullable
         @BindView(R.id.measure)
         TextView measure;
+        @Nullable
+        @BindView(R.id.stepRelativeLayout)
+        RelativeLayout relativeLayout;
 
         public MyViewHolder(View itemView) {
             super(itemView);
@@ -113,6 +107,9 @@ public class StepAdapter extends RecyclerView.Adapter<StepAdapter.MyViewHolder> 
 
         public void bind(int position) {
             if (isSteps) {
+                if(position == 0){
+                    mOnClickListener.onListItemClick(position, relativeLayout);
+                }
                 Step stepVariable = (Step) getDataAtPosition(position);
                 step.setText(stepVariable.shortDescription);
             } else {
@@ -129,7 +126,7 @@ public class StepAdapter extends RecyclerView.Adapter<StepAdapter.MyViewHolder> 
         public void onClick(View v) {
             int clickedPosition = getAdapterPosition();
             if (isSteps) {
-                mOnClickListener.onListItemClick(clickedPosition);
+                mOnClickListener.onListItemClick(clickedPosition, v);
             }
         }
 
