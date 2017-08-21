@@ -50,6 +50,7 @@ public class StepsFragment extends Fragment implements StepAdapter.ListItemClick
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_steps, container, false);
         ButterKnife.bind(this, rootView);
+        recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
 
         if (isSteps) {
             switchButton.setText(R.string.steps);
@@ -71,7 +72,6 @@ public class StepsFragment extends Fragment implements StepAdapter.ListItemClick
         GridLayoutManager layoutManager = new GridLayoutManager(getContext(), 1);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setHasFixedSize(true);
-        recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
         recipeAdapter = new StepAdapter(getContext(), object, this, isSteps);
         recyclerView.setAdapter(recipeAdapter);
     }
@@ -82,12 +82,12 @@ public class StepsFragment extends Fragment implements StepAdapter.ListItemClick
 
     @Override
     public void onListItemClick(int clickedItemIndex, View view) {
-        if (previousView != null) {
-            previousView.setSelected(false);
-        }
-        view.setSelected(true);
-        previousView = view;
         if (firstClick) {
+            if (previousView != null) {
+                previousView.setSelected(false);
+            }
+            view.setSelected(true);
+            previousView = view;
             mCallback.onImageSelected(recipeAdapter.getStepList(), clickedItemIndex);
         }
         firstClick = true;
@@ -95,6 +95,7 @@ public class StepsFragment extends Fragment implements StepAdapter.ListItemClick
 
     @OnClick(R.id.switchButton)
     public void switchView() {
+        firstClick = false;
         if (isSteps) {
             isSteps = false;
             setAdapter(recipe.ingredients);

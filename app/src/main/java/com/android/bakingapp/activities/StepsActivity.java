@@ -3,6 +3,8 @@ package com.android.bakingapp.activities;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
@@ -21,7 +23,7 @@ import static com.android.bakingapp.activities.MainActivity.STEP_NO_KEY;
 
 
 public class StepsActivity extends AppCompatActivity implements StepsFragment.OnImageClickListener {
-    private Recipe movie;
+    private Recipe recipe;
     private StepDetailsFragment stepDetailsFragment;
 
     @Override
@@ -30,16 +32,20 @@ public class StepsActivity extends AppCompatActivity implements StepsFragment.On
         setContentView(R.layout.activity_steps);
 
         if (savedInstanceState == null) {
-            movie = new Gson().fromJson(getIntent().getStringExtra(RECIPE_KEY), Recipe.class);
+            recipe = new Gson().fromJson(getIntent().getStringExtra(RECIPE_KEY), Recipe.class);
         } else {
-            movie = new Gson().fromJson(savedInstanceState.getString(RECIPE_KEY), Recipe.class);
+            recipe = new Gson().fromJson(savedInstanceState.getString(RECIPE_KEY), Recipe.class);
         }
 
         FragmentManager fragmentManager = getSupportFragmentManager();
         if (findViewById(R.id.detailsViewFrame) == null) {
             Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+            toolbar.setTitle(recipe.name);
             setSupportActionBar(toolbar);
         } else {
+            ActionBar actionBar = getSupportActionBar();
+            actionBar.setBackgroundDrawable(ContextCompat.getDrawable(this, R.drawable.gradient_tool_bar));
+            actionBar.setTitle(recipe.name);
             stepDetailsFragment = new StepDetailsFragment();
             fragmentManager.beginTransaction()
                     .add(R.id.detailsViewFrame, stepDetailsFragment)
@@ -47,7 +53,7 @@ public class StepsActivity extends AppCompatActivity implements StepsFragment.On
         }
 
         StepsFragment headFragment = new StepsFragment();
-        headFragment.setMovie(movie);
+        headFragment.setMovie(recipe);
         fragmentManager.beginTransaction()
                 .add(R.id.recyclerViewFrame, headFragment)
                 .commit();
@@ -56,7 +62,7 @@ public class StepsActivity extends AppCompatActivity implements StepsFragment.On
     @Override
     public void onSaveInstanceState(Bundle savedInstanceState) {
         super.onSaveInstanceState(savedInstanceState);
-        String jsonString = new Gson().toJson(movie);
+        String jsonString = new Gson().toJson(recipe);
         savedInstanceState.putString(RECIPE_KEY, jsonString);
     }
 

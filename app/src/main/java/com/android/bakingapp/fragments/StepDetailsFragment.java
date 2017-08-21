@@ -132,19 +132,23 @@ public class StepDetailsFragment extends Fragment implements ExoPlayer.EventList
     }
 
 
-    @Override public void onTimelineChanged(Timeline timeline, Object manifest) {
+    @Override
+    public void onTimelineChanged(Timeline timeline, Object manifest) {
 
     }
 
-    @Override public void onTracksChanged(TrackGroupArray trackGroups, TrackSelectionArray trackSelections) {
+    @Override
+    public void onTracksChanged(TrackGroupArray trackGroups, TrackSelectionArray trackSelections) {
 
     }
 
-    @Override public void onLoadingChanged(boolean isLoading) {
+    @Override
+    public void onLoadingChanged(boolean isLoading) {
 
     }
 
-    @Override public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
+    @Override
+    public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
         if ((playbackState == ExoPlayer.STATE_READY) && playWhenReady) {
             mStateBuilder.setState(PlaybackStateCompat.STATE_PLAYING,
                     mExoPlayer.getCurrentPosition(), 1f);
@@ -155,15 +159,18 @@ public class StepDetailsFragment extends Fragment implements ExoPlayer.EventList
         mMediaSession.setPlaybackState(mStateBuilder.build());
     }
 
-    @Override public void onPlayerError(ExoPlaybackException error) {
+    @Override
+    public void onPlayerError(ExoPlaybackException error) {
 
     }
 
-    @Override public void onPositionDiscontinuity() {
+    @Override
+    public void onPositionDiscontinuity() {
 
     }
 
-    @Override public boolean onTouch(View view, MotionEvent motionEvent) {
+    @Override
+    public boolean onTouch(View view, MotionEvent motionEvent) {
         if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
             xDown = (int) motionEvent.getRawX();
         }
