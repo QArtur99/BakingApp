@@ -2,6 +2,7 @@ package com.android.bakingapp.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
@@ -22,9 +23,12 @@ import static com.android.bakingapp.activities.MainActivity.STEP_KEY;
 import static com.android.bakingapp.activities.MainActivity.STEP_NO_KEY;
 
 
-public class StepsActivity extends AppCompatActivity implements StepsFragment.OnImageClickListener {
+public class StepsActivity extends AppCompatActivity implements StepsFragment.OnImageClickListener, StepDetailsFragment.OnSwipeListener {
     private Recipe recipe;
     private StepDetailsFragment stepDetailsFragment;
+    private StepsFragment headFragment;
+    public static final String BUNDLE_IS_STEPS = "bundleIsSteps";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,11 +56,16 @@ public class StepsActivity extends AppCompatActivity implements StepsFragment.On
                     .commit();
         }
 
-        StepsFragment headFragment = new StepsFragment();
+        getSupportActionBar().setHomeButtonEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        headFragment = new StepsFragment();
+        headFragment.setArguments(savedInstanceState);
         headFragment.setMovie(recipe);
         fragmentManager.beginTransaction()
                 .add(R.id.recyclerViewFrame, headFragment)
                 .commit();
+
     }
 
     @Override
@@ -64,6 +73,7 @@ public class StepsActivity extends AppCompatActivity implements StepsFragment.On
         super.onSaveInstanceState(savedInstanceState);
         String jsonString = new Gson().toJson(recipe);
         savedInstanceState.putString(RECIPE_KEY, jsonString);
+        savedInstanceState.putBoolean(BUNDLE_IS_STEPS, headFragment.getIsSteps());
     }
 
     @Override
@@ -77,5 +87,16 @@ public class StepsActivity extends AppCompatActivity implements StepsFragment.On
             intent.putExtra(STEP_NO_KEY, stepNo);
             startActivity(intent);
         }
+    }
+
+    @Override
+    public void onLayoutSwipe(final int stepNo) {
+        headFragment.scrollToPosition(stepNo);
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                headFragment.onListItemClick(stepNo, headFragment.getRecyclerViewChildAt(stepNo));
+            }
+        }, 50);
     }
 }

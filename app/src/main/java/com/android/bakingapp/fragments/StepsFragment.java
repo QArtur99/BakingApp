@@ -1,8 +1,11 @@
 package com.android.bakingapp.fragments;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DividerItemDecoration;
@@ -14,6 +17,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 
 import com.android.bakingapp.R;
+import com.android.bakingapp.activities.StepsActivity;
 import com.android.bakingapp.adapters.StepAdapter;
 import com.android.bakingapp.models.Recipe;
 import com.android.bakingapp.models.Step;
@@ -32,7 +36,10 @@ public class StepsFragment extends Fragment implements StepAdapter.ListItemClick
     private Recipe recipe;
     private boolean isSteps = true;
     private View previousView;
-    private boolean firstClick = false;
+    private int stepNo = 0;
+    private Bundle bundle;
+    private SharedPreferences sharedPreferences;
+    private GridLayoutManager layoutManager;
 
     @Override
     public void onAttach(Context context) {
@@ -50,7 +57,12 @@ public class StepsFragment extends Fragment implements StepAdapter.ListItemClick
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_steps, container, false);
         ButterKnife.bind(this, rootView);
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+        stepNo = sharedPreferences.getInt(getString(R.string.pref_lastClicked), 0);
+
         recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
+
+        bundle = this.getArguments();
 
         if (isSteps) {
             switchButton.setText(R.string.steps);
@@ -62,18 +74,61 @@ public class StepsFragment extends Fragment implements StepAdapter.ListItemClick
             setAdapter(recipe.steps);
             int orientation = getResources().getConfiguration().orientation;
             if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                mCallback.onImageSelected(recipeAdapter.getStepList(), 0);
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (bundle == null) {
+                            onListItemClick(0, layoutManager.findViewByPosition(0));
+                        } else {
+                            onListItemClick(stepNo, layoutManager.findViewByPosition(stepNo));
+                            recyclerView.scrollToPosition(stepNo);
+                            setBundleData();
+                        }
+                    }
+                }, 100);
+            } else {
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (bundle != null) {
+                            layoutManager.findViewByPosition(stepNo).setSelected(true);
+                            previousView = layoutManager.findViewByPosition(stepNo);
+                            recyclerView.scrollToPosition(stepNo);
+                            setBundleData();
+                        } else {
+                            recyclerView.getChildAt(0).setSelected(true);
+                            previousView = layoutManager.findViewByPosition(0);
+                        }
+                    }
+                }, 100);
             }
         }
+
         return rootView;
     }
 
+    private void setBundleData() {
+        isSteps = bundle.getBoolean(StepsActivity.BUNDLE_IS_STEPS, true);
+        if(!isSteps) {
+            setAdapter(recipe.ingredients);
+            switchButton.setText(R.string.ingredients);
+        }
+    }
+
     public void setAdapter(Object object) {
-        GridLayoutManager layoutManager = new GridLayoutManager(getContext(), 1);
+        layoutManager = new GridLayoutManager(getContext(), 1);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setHasFixedSize(true);
         recipeAdapter = new StepAdapter(getContext(), object, this, isSteps);
         recyclerView.setAdapter(recipeAdapter);
+    }
+
+    public View getRecyclerViewChildAt(int position) {
+        return layoutManager.findViewByPosition(position);
+    }
+
+    public void scrollToPosition(int position) {
+        recyclerView.scrollToPosition(position);
     }
 
     public void setMovie(Recipe recipe) {
@@ -81,21 +136,27 @@ public class StepsFragment extends Fragment implements StepAdapter.ListItemClick
     }
 
     @Override
-    public void onListItemClick(int clickedItemIndex, View view) {
-        if (firstClick) {
-            if (previousView != null) {
-                previousView.setSelected(false);
-            }
+    public void onListItemClick(final int clickedItemIndex, final View view) {
+        sharedPreferences.edit().putInt(getString(R.string.pref_lastClicked), clickedItemIndex).apply();
+        if (previousView != null) {
+            previousView.setSelected(false);
+        }
+
+        if (view != null) {
             view.setSelected(true);
             previousView = view;
-            mCallback.onImageSelected(recipeAdapter.getStepList(), clickedItemIndex);
         }
-        firstClick = true;
+
+        mCallback.onImageSelected(recipeAdapter.getStepList(), clickedItemIndex);
+
+    }
+
+    public Boolean getIsSteps(){
+        return isSteps;
     }
 
     @OnClick(R.id.switchButton)
     public void switchView() {
-        firstClick = false;
         if (isSteps) {
             isSteps = false;
             setAdapter(recipe.ingredients);
@@ -106,7 +167,6 @@ public class StepsFragment extends Fragment implements StepAdapter.ListItemClick
             switchButton.setText(R.string.steps);
         }
     }
-
 
     public interface OnImageClickListener {
         void onImageSelected(List<Step> steps, int stepNo);

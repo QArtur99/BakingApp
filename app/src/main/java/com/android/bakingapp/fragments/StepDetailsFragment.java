@@ -1,5 +1,6 @@
 package com.android.bakingapp.fragments;
 
+import android.content.Context;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
@@ -44,6 +45,7 @@ public class StepDetailsFragment extends Fragment implements ExoPlayer.EventList
     @BindView(R.id.playerView) SimpleExoPlayerView mPlayerView;
     @BindView(R.id.description) TextView description;
     int stepNo;
+    private OnSwipeListener mCallback;
     private PlaybackStateCompat.Builder mStateBuilder;
     private SimpleExoPlayer mExoPlayer;
     private List<Step> steps;
@@ -72,6 +74,17 @@ public class StepDetailsFragment extends Fragment implements ExoPlayer.EventList
         releasePlayer();
         initializePlayer(Uri.parse(steps.get(stepNo).videoURL));
         description.setText(steps.get(stepNo).description);
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        try {
+            mCallback = (OnSwipeListener) context;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(context.toString()
+                    + " must implement OnImageClickListener");
+        }
     }
 
     public void setData(List<Step> steps, int stepNo) {
@@ -121,6 +134,24 @@ public class StepDetailsFragment extends Fragment implements ExoPlayer.EventList
             mExoPlayer.stop();
             mExoPlayer.release();
             mExoPlayer = null;
+        }
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        if (Util.SDK_INT > 23) {
+            if (steps != null) {
+                initializePlayer(Uri.parse(steps.get(stepNo).videoURL));
+            }
+        }
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (Util.SDK_INT > 23) {
+            releasePlayer();
         }
     }
 
@@ -178,19 +209,29 @@ public class StepDetailsFragment extends Fragment implements ExoPlayer.EventList
             if (Math.abs(xDown - motionEvent.getRawX()) > 50)
                 if (xDown - motionEvent.getRawX() > 0) {
                     if (steps.size() > stepNo + 1) {
-                        setStep(steps, stepNo + 1);
+                        stepNo = stepNo + 1;
+                        setStep(steps, stepNo);
+                        mCallback.onLayoutSwipe(stepNo);
                     } else {
                         setStep(steps, 0);
+                        mCallback.onLayoutSwipe(0);
                     }
                 } else {
                     if (stepNo > 0) {
-                        setStep(steps, stepNo - 1);
+                        stepNo = stepNo - 1;
+                        setStep(steps, stepNo);
+                        mCallback.onLayoutSwipe(stepNo);
                     } else {
                         setStep(steps, steps.size() - 1);
+                        mCallback.onLayoutSwipe(steps.size() - 1);
                     }
                 }
         }
         return true;
+    }
+
+    public interface OnSwipeListener {
+        void onLayoutSwipe(int stepNo);
     }
 
     private class MySessionCallback extends MediaSessionCompat.Callback {

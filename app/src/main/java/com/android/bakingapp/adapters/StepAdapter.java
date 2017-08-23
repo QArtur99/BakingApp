@@ -6,12 +6,14 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.android.bakingapp.R;
 import com.android.bakingapp.models.Ingredient;
 import com.android.bakingapp.models.Step;
+import com.bumptech.glide.Glide;
 
 import java.util.List;
 
@@ -87,6 +89,9 @@ public class StepAdapter extends RecyclerView.Adapter<StepAdapter.MyViewHolder> 
     public class MyViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         @Nullable
+        @BindView(R.id.itemImageStep)
+        ImageView itemImageStep;
+        @Nullable
         @BindView(R.id.step)
         TextView step;
         @Nullable
@@ -107,11 +112,14 @@ public class StepAdapter extends RecyclerView.Adapter<StepAdapter.MyViewHolder> 
 
         public void bind(int position) {
             if (isSteps) {
-                if(position == 0){
-                    mOnClickListener.onListItemClick(position, relativeLayout);
-                }
                 Step stepVariable = (Step) getDataAtPosition(position);
                 step.setText(stepVariable.shortDescription);
+                if(!stepVariable.thumbnailURL.isEmpty()){
+                    Glide.with(context)
+                            .load(stepVariable.thumbnailURL)
+                            .thumbnail(Glide.with(context).load(R.drawable.baking_app))
+                            .into(itemImageStep);
+                }
             } else {
                 Ingredient ingredientVariable = (Ingredient) getDataAtPosition(position);
                 ingredient.setText(ingredientVariable.ingredient);

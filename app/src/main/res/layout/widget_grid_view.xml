@@ -3,36 +3,32 @@
              android:layout_width="match_parent"
              android:layout_height="match_parent">
 
-    <!--<GridView-->
-        <!--android:id="@+id/widget_grid_view"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="match_parent"-->
-        <!--android:gravity="center"-->
-        <!--android:numColumns="1"/>-->
     <StackView
-               android:id="@+id/widget_grid_view"
-               android:layout_width="match_parent"
-               android:layout_height="match_parent"
-               android:loopViews="true" />
+        android:id="@+id/widget_grid_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:loopViews="true"/>
 
     <RelativeLayout
         android:id="@+id/empty_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
+
         <TextView
-            android:layout_centerInParent="true"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAlignment="center"
+            android:layout_centerInParent="true"
             android:text="@string/app_name"
+            android:textAlignment="center"
             android:textColor="#ffffff"
             android:textSize="20sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"/>
+
         <ImageView
-            android:alpha="0.2"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:alpha="0.2"
             android:src="@drawable/ic_empty_inventory"/>
 
     </RelativeLayout>

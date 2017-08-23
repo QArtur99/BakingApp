@@ -119,15 +119,20 @@ class GridRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
         JSONArray jsonArray = new JSONArray(jsonString);
         int recipeAmount = jsonArray.length();
         for (int i = 0; recipeAmount > i; i++) {
-            JSONObject jsonBookData = jsonArray.getJSONObject(i);
+            JSONObject jsonRecipeData = jsonArray.getJSONObject(i);
 
-            String id = jsonBookData.getString("id");
-            String name = jsonBookData.getString("name");
-            JSONArray ingredients = jsonBookData.getJSONArray("ingredients");
-            JSONArray steps = jsonBookData.getJSONArray("steps");
-            String servings = jsonBookData.getString("servings");
+            String id = jsonRecipeData.getString("id");
+            String name = jsonRecipeData.getString("name");
+            JSONArray ingredients = jsonRecipeData.getJSONArray("ingredients");
+            JSONArray steps = jsonRecipeData.getJSONArray("steps");
+            String servings = jsonRecipeData.getString("servings");
 
-            data.add(new Recipe(id, name, getIngredients(ingredients), getSteps(steps), servings));
+            String image = "";
+            if (jsonRecipeData.has("image")) {
+                image = jsonRecipeData.getString("image");
+            }
+
+            data.add(new Recipe(id, name, getIngredients(ingredients), getSteps(steps), servings, image));
         }
 
     }
@@ -156,7 +161,7 @@ class GridRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
     }
 
     private List<Step> getSteps(JSONArray jsonArray) throws JSONException {
-        String id = "", shortDescription = "", description = "", videoURL = "";
+        String id = "", shortDescription = "", description = "", videoURL = "", thumbnailURL = "";
         List<Step> list = new ArrayList<>();
         for (int i = 0; jsonArray.length() > i; i++) {
             JSONObject jsonObject = jsonArray.getJSONObject(i);
@@ -177,7 +182,11 @@ class GridRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
                 videoURL = jsonObject.getString("videoURL");
             }
 
-            list.add(new Step(id, shortDescription, description, videoURL));
+            if (jsonObject.has("thumbnailURL")) {
+                thumbnailURL = jsonObject.getString("thumbnailURL");
+            }
+
+            list.add(new Step(id, shortDescription, description, videoURL, thumbnailURL));
         }
         return list;
     }

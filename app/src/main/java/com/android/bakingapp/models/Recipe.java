@@ -12,12 +12,14 @@ public class Recipe {
     public List<Ingredient> ingredients;
     public List<Step> steps;
     public String servings;
+    public String image;
 
-    public Recipe(String id, String name, List<Ingredient> ingredients, List<Step> steps, String servings){
+    public Recipe(String id, String name, List<Ingredient> ingredients, List<Step> steps, String servings, String image){
         this.id = id;
         this.name = name;
         this.ingredients = ingredients;
         this.steps = steps;
         this.servings = servings;
+        this.image = image;
     }
 }

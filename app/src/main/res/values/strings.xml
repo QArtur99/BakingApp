@@ -19,6 +19,12 @@
     <string name="add_widget">Add widget</string>
 
 
+    //onSaveInstanceState
+    <string name="pref_pageNo" translatable="false">pref_pageNo</string>
+    <string name="pref_firstView" translatable="false">pref_firstView</string>
+    <string name="pref_lastClicked" translatable="false">pref_lastClicked</string>
+
+
     //Test
     <string name="test">Test</string>
 

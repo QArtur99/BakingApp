@@ -81,15 +81,21 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.MyViewHold
         }
 
         public void bind(int position) {
-            Recipe movie = (Recipe) getDataAtPosition(position);
-            int last = movie.steps.size();
-            String posterURL = movie.steps.get(last - 1).videoURL;
+            Recipe recipe = (Recipe) getDataAtPosition(position);
+            int last = recipe.steps.size();
+
+            String posterURL;
+            if(recipe.image.isEmpty()) {
+                posterURL = recipe.steps.get(last - 1).videoURL;
+            }else{
+                posterURL = recipe.image;
+            }
 
             Glide.with(context)
                     .load(posterURL)
                     .thumbnail(Glide.with(context).load(R.drawable.baking_app))
                     .into(poster);
-            movieTitle.setText(movie.name);
+            movieTitle.setText(recipe.name);
         }
 
         @Override
